@@ -10,7 +10,7 @@ entry.put("description","Link Your IoT Device Before Use");
 entry.put("imageurl","https://media.giphy.com/media/UIUaD8DbQm2NIFU771/giphy.gif");
 if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() = 0)
 {
-list.add(entry);
+	list.add(entry);
 }
 entry1 = Map();
 entry1.put("title","View Devices");
@@ -33,6 +33,6 @@ entry4.put("description","Update Device Info");
 entry4.put("imageurl","https://media.giphy.com/media/jwqMFFTZuntRM7WaIt/giphy.gif");
 if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
 {
-list.add(entry4);
+	list.add(entry4);
 }
 return list;

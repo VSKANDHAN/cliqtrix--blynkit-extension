@@ -62,6 +62,11 @@ if(selections.size() > 0)
 			response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
 		}
 	}
+	else if(details.get("title").containsIgnoreCase("Update Device"))
+	{
+		slidesArray.add({"type":"text","title":"Time to Revamp!","buttons":{{"label":"Edit","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"editdevice"}},"key":""},{"label":"Delete","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"deletedevice"}},"key":""}},"data":""});
+		response = {"text":"Update Device 🚀","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
 	else
 	{
 		info "Not a Valid Selection";
