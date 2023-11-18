@@ -1,0 +1,16 @@
+response=Map();
+query_map = Map();
+criteria_string = 0;
+query_map.put("from_index",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+record_id = 0;
+if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+{
+	record_id = response_map.get("list").get(0).get("id");
+}
+if(record_id.length() > 0)
+{
+	response_map = zoho.cliq.deleteRecord("deviceinfo",record_id);
+}
+response={"text":"Device Deleted!, Connect Something New🦾"};
+return response;
