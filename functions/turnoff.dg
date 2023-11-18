@@ -1,0 +1,19 @@
+
+id = arguments.get('key');
+response = Map();
+token = 'XK9n_ddhUlR1-AoYM4_cfDvzAsJUJSNL';
+res = invokeurl
+[
+	url :"https://blr1.blynk.cloud/external/api/update?token=" + token + "&" + id + "=0"
+	type :GET
+	detailed:true
+];
+if(res.get("responseCode") == 200)
+{
+	response = {"text":"Device Turned OFF, Thanks For Saving Energy!"};
+}
+else
+{
+	response = {"text":"Oops! The Device is feeling a bit shy about turning on right now"};
+}
+return response;

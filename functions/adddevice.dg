@@ -1,0 +1,11 @@
+
+response = Map();
+devicename = form.get("values").get("devicename");
+deviceauthtoken = form.get("values").get("deviceauthtoken");
+values_map = Map();
+values_map.put("devicename",devicename);
+values_map.put("deviceauthtoken",deviceauthtoken);
+response_map = zoho.cliq.createRecord("deviceinfo",values_map);
+
+response = {"text":"Devices Added 🚀"};
+return response;
