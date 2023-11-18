@@ -10,7 +10,6 @@ if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("l
 {
 	authtoken = response_map.get("list").get(0).get("deviceauthtoken");
 }
-info authtoken;
 if(selections.size() > 0)
 {
 	details = selections.get(0).toMap();
@@ -44,7 +43,7 @@ if(selections.size() > 0)
 					status = '';
 					if(value == 0)
 					{
-						status = 'OFF';
+						status = 'OFF💤';
 					}
 					else if(value == 1)
 					{

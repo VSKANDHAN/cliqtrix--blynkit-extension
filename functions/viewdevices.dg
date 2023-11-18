@@ -28,7 +28,7 @@ else
 		status = '';
 		if(value == 0)
 		{
-			status = 'OFF';
+			status = 'OFF💤';
 		}
 		else if(value == 1)
 		{
