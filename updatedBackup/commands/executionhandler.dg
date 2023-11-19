@@ -1,0 +1,84 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+criteria_string = "";
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+// authtoken = '';
+// if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+// {
+// 	authtoken = response_map.get("list").get(0).get("deviceauthtoken");
+// }
+if(selections.size() > 0)
+{
+	details = selections.get(0).toMap();
+	if(details.get("title").containsIgnoreCase("Add Device"))
+	{
+		inputs = list();
+		inputs.add({"type":"text","name":"devicename","label":"Device Name","hint":"Set A Device Nick Name","placeholder":"Eg: WorkSpace Lights!, Pantry Lights!","mandatory":true,"value":"","max_length":"90","min_length":""});
+		inputs.add({"type":"text","name":"deviceauthtoken","label":"Device Auth Token","hint":"Find Your Auth Token in Blynk's Device Info","placeholder":"BLYNK_AUTH_TOKEN","mandatory":true,"value":"","max_length":"90","min_length":""});
+		form = {"type":"form","title":"Add Device","hint":"Enter Your Blynk Device Auth Token To Tet Started!","name":"ID","version":1,"button_label":"Add","action":{"type":"invoke.function","name":"adddevice"},"inputs":inputs};
+		return form;
+	}
+	else if(details.get("title").containsIgnoreCase("View Devices"))
+	{
+		if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+		{
+			devices = response_map.get("list");
+			for each  device in devices
+			{
+				devicename = device.get("devicename");
+				deviceauthtoken = device.get("deviceauthtoken");
+				deviceid = device.get("id");
+				info deviceid;
+				slidesArray.add({"type":"text","title":devicename,"buttons":{{"label":"View ","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewdevices"}},"key":{"id":deviceid}},{"label":"Update","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+				response = {"text":"Connected Devices🔌","card":{"theme":"modern-inline"},"slides":slidesArray};
+			}
+			// 			apiRes = getUrl('https://blr1.blynk.cloud/external/api/getAll?token=' + authtoken);
+			// 			devices = apiRes.keys();
+			// 			info apiRes;
+			// 			i = 1;
+			// 			if(apiRes.containKey("error"))
+			// 			{
+			// 				err = apiRes.get("error").get("message");
+			// 				slidesArray.add({"type":"text","title":err,"buttons":{{"label":"Edit Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"editdevice"}},"key":""}},"data":""});
+			// 				response = {"text":"An unexpected twist🤔","card":{"theme":"modern-inline"},"slides":slidesArray};
+			// 			}
+			// 			else
+			// 			{
+			// 				for each  device in devices
+			// 				{
+			// 					value = apiRes.get(device);
+			// 					status = '';
+			// 					if(value == 0)
+			// 					{
+			// 						status = 'OFF💤';
+			// 					}
+			// 					else if(value == 1)
+			// 					{
+			// 						status = 'ON💡';
+			// 					}
+			// 					slidesArray.add({"type":"text","title":"Device" + i,"buttons":{{"label":"Turn ON","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"turnon"}},"key":device},{"label":"Turn OFF","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"turnoff"}},"key":device}},"data":"Status:" + status});
+			// 					i = i + 1;
+			// 				}
+			// 				response = {"text":"Connected Devices🔌","card":{"theme":"modern-inline"},"slides":slidesArray};
+			// 			}
+		}
+		else
+		{
+			slidesArray.add({"type":"text","title":"Please Add Your Device!","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+			response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+	}
+	else if(details.get("title").containsIgnoreCase("Update Device"))
+	{
+		slidesArray.add({"type":"text","title":"Time to Revamp!","buttons":{{"label":"Edit","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"editdevice"}},"key":""},{"label":"Delete","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"deletedevice"}},"key":""}},"data":""});
+		response = {"text":"Update Device 🚀","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+	else
+	{
+		info "Not a Valid Selection";
+	}
+}
+return response;

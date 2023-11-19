@@ -1,0 +1,39 @@
+
+slidesArray = List();
+response = Map();
+devicename = form.get("values").get("devicename");
+deviceauthtoken = form.get("values").get("deviceauthtoken");
+record_id = form.get("values").get("deviceid");
+info record_id;
+values_map = Map();
+values_map.put("devicename",devicename);
+values_map.put("deviceauthtoken",deviceauthtoken);
+// Set values for other fields if required 
+query_map = Map();
+criteria_string = "id==" + record_id;
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+info response_map;
+if(record_id.length() > 0)
+{
+	response_map = zoho.cliq.updateRecord("deviceinfo",record_id,values_map);
+}
+// if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+// {
+// 	response_map = zoho.cliq.updateRecord("deviceinfo",record_id,values_map);
+// }
+// if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+// {
+slidesArray.add({"type":"text","title":"Device Updated!","buttons":{{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewnodes"}},"key":"1"}},"data":""});
+response = {"text":"Good To Go🚀","card":{"theme":"modern-inline"},"slides":slidesArray};
+// }
+// if(record_id.length() > 0)
+// {
+// 	response_map = zoho.cliq.updateRecord("deviceinfo",record_id,values_map);
+// }
+// else 
+// {
+// slidesArray.add({"type":"text","title":"Something Wrong in Update!","buttons":{{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"invokeeditdevice"}},"key":{"name":devicename,"token":deviceauthtoken,"id":record_id}}},"data":""});
+// response = {"text":"An unexpected twist🤔","card":{"theme":"modern-inline"},"slides":slidesArray};	
+// }
+return response;

@@ -1,0 +1,20 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+deviceid = arguments.get("key").get("id");
+criteria_string = "id==" + deviceid;
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+deviceauthtoken = "";
+if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+{
+	deviceauthtoken = response_map.get("list").get(0).get("deviceauthtoken");
+	devicename = response_map.get("list").get(0).get("devicename");
+}
+inputs = list();
+inputs.add({"type":"text","name":"devicename","label":"Device Name","hint":"Set A Device Nick Name","placeholder":"Eg: WorkSpace Lights!, Pantry Lights!","mandatory":true,"value":devicename,"max_length":"90","min_length":""});
+inputs.add({"type":"text","name":"deviceauthtoken","label":"Device Auth Token","hint":"Find Your Auth Token in Blynk's Device Info","placeholder":"BLYNK_AUTH_TOKEN","mandatory":true,"value":deviceauthtoken,"max_length":"100","min_length":""});
+inputs.add({"type":"hidden","name":"deviceid","value":deviceid});
+form = {"type":"form","title":"Edit Device","hint":"Enter Your Blynk Device Auth Token To Tet Started!","name":"ID","version":1,"button_label":"Update","action":{"type":"invoke.function","name":"updatedevice"},"inputs":inputs};
+return form;

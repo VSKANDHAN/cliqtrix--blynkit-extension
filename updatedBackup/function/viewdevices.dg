@@ -1,0 +1,44 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+deviceid = arguments.get("key").get("id");
+criteria_string = "id==" + deviceid;
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+deviceauthtoken = "";
+if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+{
+	deviceauthtoken = response_map.get("list").get(0).get("deviceauthtoken");
+	devicename = response_map.get("list").get(0).get("devicename");
+}
+apiRes = getUrl('https://blr1.blynk.cloud/external/api/getAll?token=' + deviceauthtoken);
+devices = apiRes.keys();
+info apiRes;
+i = 1;
+if(apiRes.containKey("error"))
+{
+	err = apiRes.get("error").get("message");
+	slidesArray.add({"type":"text","title":err,"buttons":{{"label":"Edit Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+	response = {"text":"An unexpected twist🤔","card":{"theme":"modern-inline"},"slides":slidesArray};
+}
+else
+{
+	for each  device in devices
+	{
+		value = apiRes.get(device);
+		status = '';
+		if(value == 0)
+		{
+			status = 'OFF💤';
+		}
+		else if(value == 1)
+		{
+			status = 'ON💡';
+		}
+		slidesArray.add({"type":"text","title":"Device" + i,"buttons":{{"label":"Turn ON","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"turnon"}},"key":{"token":deviceauthtoken,"device":device,"id":deviceid}},{"label":"Turn OFF","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"turnoff"}},"key":{"token":deviceauthtoken,"device":device,"id":deviceid}}},"data":"Status:" + status});
+		i = i + 1;
+	}
+	response = {"text":devicename,"card":{"theme":"modern-inline"},"slides":slidesArray};
+}
+return response;

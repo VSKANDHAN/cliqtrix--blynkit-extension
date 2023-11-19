@@ -1,0 +1,24 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+record_id = arguments.get("key").get("id");
+query_map = Map();
+criteria_string = "";
+query_map.put("criteria",criteria_string);
+if(record_id.length() > 0)
+{
+	response_map = zoho.cliq.deleteRecord("deviceinfo",record_id);
+}
+response_map1 = zoho.cliq.getRecords("deviceinfo",query_map);
+info response_map1;
+if(response_map1.get("list").size() == 0)
+{
+	slidesArray.add({"type":"text","title":"Connect Something New🦾","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+}
+else
+{
+	slidesArray.add({"type":"text","title":"Connect Something New🦾","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""},{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewnodes"}},"key":""}},"data":""});
+}
+response = {"text":"Device Deleted!","card":{"theme":"modern-inline"},"slides":slidesArray};
+return response;
