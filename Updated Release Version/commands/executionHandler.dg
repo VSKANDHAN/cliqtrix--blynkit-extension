@@ -1,0 +1,108 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+criteria_string = "";
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+if(selections.size() > 0)
+{
+	details = selections.get(0).toMap();
+	if(details.get("title").containsIgnoreCase("Add Device"))
+	{
+		inputs = list();
+		inputs.add({"type":"text","name":"devicename","label":"Device Name","hint":"Set A Device Nick Name","placeholder":"Eg: WorkSpace Lights!, Pantry Lights!","mandatory":true,"value":"","max_length":"90","min_length":""});
+		inputs.add({"type":"text","name":"deviceauthtoken","label":"Device Auth Token","hint":"Find Your Auth Token in Blynk's Device Info","placeholder":"BLYNK_AUTH_TOKEN","mandatory":true,"value":"","max_length":"90","min_length":""});
+		form = {"type":"form","title":"Add Device","hint":"Enter Your Blynk Device Auth Token To Tet Started!","name":"ID","version":1,"button_label":"Add","action":{"type":"invoke.function","name":"adddevice"},"inputs":inputs};
+		return form;
+	}
+	else if(details.get("title").containsIgnoreCase("View Devices"))
+	{
+		if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+		{
+			devices = response_map.get("list");
+			for each  device in devices
+			{
+				devicename = device.get("devicename");
+				deviceauthtoken = device.get("deviceauthtoken");
+				deviceid = device.get("id");
+				info deviceid;
+				slidesArray.add({"type":"text","title":devicename,"buttons":{{"label":"View ","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewdevices"}},"key":{"id":deviceid}},{"label":"Update","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+				response = {"text":"Connected Devices🔌","card":{"theme":"modern-inline"},"slides":slidesArray};
+			}
+		}
+		else
+		{
+			slidesArray.add({"type":"text","title":"Please Add Your Device!","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+			response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+	}
+	else if(details.get("title").containsIgnoreCase("Schedule A Device"))
+	{
+		if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+		{
+			slidesArray.add({"type":"text","title":"Control Your J.A.R.V.I.S 🚀","buttons":{{"label":"Schedule","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"setschedule"}},"key":""}},"data":""});
+			response = {"text":"Time to Automate 🤖","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+		else
+		{
+			slidesArray.add({"type":"text","title":"Please Add Your Device!","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+			response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+	}
+	else if(details.get("title").containsIgnoreCase("Ring An Alarm"))
+	{
+		devices = response_map.get("list");
+		alarmlist = false;
+		alarmring = false;
+		for each  device in devices
+		{
+			devicename = device.get("devicename");
+			deviceauthtoken = device.get("deviceauthtoken");
+			deviceid = device.get("id");
+			schedule = device.get("schedule");
+			if(devicename.containsIgnoreCase("Alarm"))
+			{
+				alarmlist = true;
+				apiRes = getUrl('https://blr1.blynk.cloud/external/api/getAll?token=' + deviceauthtoken);
+				devices1 = apiRes.keys();
+				for each  device1 in devices1
+				{
+					res = invokeurl
+					[
+						url :"https://blr1.blynk.cloud/external/api/update?token=" + deviceauthtoken + "&" + device1 + "=1"
+						type :GET
+						detailed:true
+					];
+					if(res.get("responseCode") == 200)
+					{
+						alarmring = true;
+					}
+					else
+					{
+						alarmring = false;
+					}
+				}
+			}
+		}
+		if(alarmlist && alarmring)
+		{
+			slidesArray.add({"type":"text","title":"Alarm Ringing...🔔","buttons":{{"label":"Stop Ringing 🔕","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"alarmoff"}},"key":{"id":deviceid}}},"data":""});
+			response = {"text":"Time to Get Ready🕺","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+		else
+		{
+			response = {"text":"Cant able to Ring an Alarm"};
+		}
+		if(alarmlist == false)
+		{
+			slidesArray.add({"type":"text","title":"Please Add Your Alarm or Ensure Device Name is 'Alarm' for Alarm Feature","buttons":{{"label":"Add Alarm🔔","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+			response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+	}
+	else
+	{
+		response = {"text":"Sorry 🙃 Out Of My Scope🤖"};
+	}
+}
+return response;

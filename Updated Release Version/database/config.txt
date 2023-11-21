@@ -1,0 +1,3 @@
+devicename=text;
+deviceauthtoken=largetext;
+schedule=boolean;

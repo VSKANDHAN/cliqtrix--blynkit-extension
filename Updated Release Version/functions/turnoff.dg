@@ -1,0 +1,22 @@
+
+slidesArray = List();
+response = Map();
+deviceid = arguments.get("key").get("id");
+id = arguments.get('key').get('device');
+token = arguments.get('key').get('token');
+res = invokeurl
+[
+	url :"https://blr1.blynk.cloud/external/api/update?token=" + token + "&" + id + "=0"
+	type :GET
+	detailed:true
+];
+if(res.get("responseCode") == 200)
+{
+	slidesArray.add({"type":"text","title":"Thanks For Saving Energy!⚡ ","buttons":{{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewdevices"}},"key":{"id":deviceid}}},"data":""});
+	response = {"text":"Device Turned OFF","card":{"theme":"modern-inline"},"slides":slidesArray};
+}
+else
+{
+	response = {"text":"Oops! The Device is feeling a bit shy about turning OFF right now"};
+}
+return response;

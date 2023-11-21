@@ -1,0 +1,14 @@
+
+slidesArray = List();
+response = Map();
+devicename = form.get("values").get("devicename");
+deviceauthtoken = form.get("values").get("deviceauthtoken");
+schedule = form.get("values").get("schedule");
+values_map = Map();
+values_map.put("devicename",devicename);
+values_map.put("deviceauthtoken",deviceauthtoken);
+response_map = zoho.cliq.createRecord("deviceinfo",values_map);
+info response_map;
+slidesArray.add({"type":"text","title":"Device Added! ","buttons":{{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewnodes"}},"key":{"name":devicename,"token":deviceauthtoken}}},"data":""});
+response = {"text":"Great🚀","card":{"theme":"modern-inline"},"slides":slidesArray};
+return response;

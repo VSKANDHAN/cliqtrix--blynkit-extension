@@ -1,0 +1,30 @@
+
+query_map = Map();
+criteria_string = "";
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+{
+	devices = response_map.get("list");
+	for each  device in devices
+	{
+		devicename = device.get("devicename");
+		deviceauthtoken = device.get("deviceauthtoken");
+		deviceid = device.get("id");
+		schedule = device.get("schedule");
+		if(schedule)
+		{
+			apiRes = getUrl('https://blr1.blynk.cloud/external/api/getAll?token=' + deviceauthtoken);
+			devices1 = apiRes.keys();
+			for each  device1 in devices1
+			{
+				res = invokeurl
+				[
+					url :"https://blr1.blynk.cloud/external/api/update?token=" + deviceauthtoken + "&" + device1 + "=0"
+					type :GET
+					detailed:true
+				];
+			}
+		}
+	}
+}
