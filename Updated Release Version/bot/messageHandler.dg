@@ -1,0 +1,157 @@
+
+slidesArray = List();
+response = Map();
+query_map = Map();
+criteria_string = "";
+query_map.put("criteria",criteria_string);
+response_map = zoho.cliq.getRecords("deviceinfo",query_map);
+if(message.containsIgnoreCase("HI") || message.containsIgnoreCase("HEY") || message.containsIgnoreCase("blynkit") || message.containsIgnoreCase("hello"))
+{
+	text = "Hi! " + user.get("first_name") + " :wink: How Can I Help You?";
+	response.put("suggestions",{"list":{{"text":"Add Device"},{"text":"View Devices"},{"text":"Schedule A Device"},{"text":"Ring An Alarm"},{"text":"Check CCTV Status"}}});
+	response.put("text",text);
+}
+else if(message.equals("Meh!"))
+{
+	text = "Oops! Don't you worry. Your day is definitely going to get better. :grinning:";
+	response.put("text",text);
+}
+else if(message.containsIgnoreCase("add device"))
+{
+	context = {"id":"adddevice","timeout":"300","params":{{"name":"devicename","question":"Ready to name your Device🚀 What's your pick? E.g., ","suggestions":{"list":{{"text":"Workspace Lights"},{"text":"Alarm"},{"text":"CCTV"}}}},{"name":"deviceauthtoken","question":"What's Your Device Auth Token?"}}};
+	response.put("context",context);
+}
+else if(message.containsIgnoreCase("view devices"))
+{
+	if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+	{
+		devices = response_map.get("list");
+		for each  device in devices
+		{
+			devicename = device.get("devicename");
+			deviceauthtoken = device.get("deviceauthtoken");
+			deviceid = device.get("id");
+			info deviceid;
+			slidesArray.add({"type":"text","title":devicename,"buttons":{{"label":"View ","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewdevices"}},"key":{"id":deviceid}},{"label":"Update","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+			response = {"text":"Connected Devices🔌","card":{"theme":"modern-inline"},"slides":slidesArray};
+		}
+	}
+	else
+	{
+		slidesArray.add({"type":"text","title":"Please Add Your Device!","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+		response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+}
+else if(message.containsIgnoreCase("Schedule A Device"))
+{
+	if(response_map.get("status").equalsIgnoreCase("SUCCESS") && response_map.get("list").size() > 0)
+	{
+		slidesArray.add({"type":"text","title":"Control Your J.A.R.V.I.S 🚀","buttons":{{"label":"Schedule","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"setschedule"}},"key":""}},"data":""});
+		response = {"text":"Time to Automate 🤖","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+	else
+	{
+		slidesArray.add({"type":"text","title":"Please Add Your Device!","buttons":{{"label":"Add Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+		response = {"text":"Nothing To Worry!😉","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+}
+else if(message.containsIgnoreCase("ring an alarm"))
+{
+	devices = response_map.get("list");
+	alarmlist = false;
+	alarmring = false;
+	for each  device in devices
+	{
+		devicename = device.get("devicename");
+		deviceauthtoken = device.get("deviceauthtoken");
+		deviceid = device.get("id");
+		schedule = device.get("schedule");
+		if(devicename.containsIgnoreCase("Alarm"))
+		{
+			alarmlist = true;
+			apiRes = getUrl('https://blr1.blynk.cloud/external/api/getAll?token=' + deviceauthtoken);
+			devices1 = apiRes.keys();
+			for each  device1 in devices1
+			{
+				res = invokeurl
+				[
+					url :"https://blr1.blynk.cloud/external/api/update?token=" + deviceauthtoken + "&" + device1 + "=1"
+					type :GET
+					detailed:true
+				];
+				if(res.get("responseCode") == 200)
+				{
+					alarmring = true;
+				}
+				else
+				{
+					slidesArray.add({"type":"text","title":"Check Device Auth Token!","buttons":{{"label":"Edit Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+					response = {"text":"An unexpected twist🤔","card":{"theme":"modern-inline"},"slides":slidesArray};
+				}
+			}
+		}
+	}
+	if(alarmlist && alarmring)
+	{
+		slidesArray.add({"type":"text","title":"Alarm Ringing...🔔","buttons":{{"label":"Stop Ringing 🔕","hint":"","type":"-","action":{"type":"invoke.function","data":{"name":"alarmoff"}},"key":{"id":deviceid}}},"data":""});
+		response = {"text":"Time to Get Ready🕺","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+	if(alarmlist == false)
+	{
+		slidesArray.add({"type":"text","title":"Ensure Device Name is 'Alarm' for Alarm Feature","buttons":{{"label":"Add Alarm🔔","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+		response = {"text":"Nothing To Worry!😉Please Add Your Alarm","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+}
+else if(message.containsIgnoreCase("check cctv status"))
+{
+	devices = response_map.get("list");
+	cctvlist = false;
+	for each  device in devices
+	{
+		devicename = device.get("devicename");
+		deviceauthtoken = device.get("deviceauthtoken");
+		deviceid = device.get("id");
+		schedule = device.get("schedule");
+		if(devicename.containsIgnoreCase("cctv"))
+		{
+			cctvlist = true;
+			devicestatus = invokeurl
+			[
+				url :"https://blr1.blynk.cloud/external/api/isHardwareConnected?token=" + deviceauthtoken
+				type :GET
+				detailed:true
+			];
+			if(devicestatus.get("responseCode") == 200)
+			{
+				if(devicestatus.containsIgnoreCase("true"))
+				{
+					slidesArray.add({"type":"text","title":"Everything is Secure🔐","buttons":{{"label":"View Devices","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"viewnodes"}},"key":"1"}},"data":""});
+					response = {"text":"Good To Go🚀","card":{"theme":"modern-inline"},"slides":slidesArray};
+				}
+				else
+				{
+					text1 = "⚠️Something Unusual In Surveillance, Verify It Soon.";
+					message = {"text":text1,"card":{"theme":"modern-inline"}};
+					zoho.cliq.postToChat(chat.get("id"),message);
+				}
+			}
+			else
+			{
+				slidesArray.add({"type":"text","title":"Check Device Auth Token!","buttons":{{"label":"Edit Device","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"invokeupdatedevice"}},"key":{"id":deviceid}}},"data":""});
+				response = {"text":"An unexpected twist🤔","card":{"theme":"modern-inline"},"slides":slidesArray};
+			}
+			devicestatus = getUrl('https://blr1.blynk.cloud/external/api/isHardwareConnected?token=' + deviceauthtoken);
+		}
+	}
+	if(cctvlist == false)
+	{
+		slidesArray.add({"type":"text","title":"Ensure Device Name is 'CCTV' to Check Status Feature","buttons":{{"label":"Add CCTV 📹","hint":"","type":"+","action":{"type":"invoke.function","data":{"name":"adddevicea"}},"key":""}},"data":""});
+		response = {"text":"Nothing To Worry!😉Please Add Your CCTV","card":{"theme":"modern-inline"},"slides":slidesArray};
+	}
+}
+else
+{
+	text = "Messaging me for the first time? Come say a Hi ! :grinning:";
+	response.put("text",text);
+}
+return response;
